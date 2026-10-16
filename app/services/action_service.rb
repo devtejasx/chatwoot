@@ -44,7 +44,14 @@ class ActionService
     return @conversation.with_lock { @conversation.update!(assignee_id: nil) } if agent_ids[0] == 'nil'
 
     agent_ids = [last_responding_agent_id] if agent_ids[0] == 'last_responding_agent'
-    return unless agent_belongs_to_inbox?(agent_ids)
+    unless agent_belongs_to_inbox?(agent_ids)
+      # Macros and automation rules otherwise skip this action without any trace
+      if agent_ids[0].present?
+        Rails.logger.warn("Skipped assign_agent for conversation #{@conversation.id}: agent #{agent_ids[0]} " \
+                          "is neither a member of inbox #{@conversation.inbox_id} nor an administrator")
+      end
+      return
+    end
 
     @agent = @account.users.find_by(id: agent_ids)
     return unless @agent.present? && @agent.confirmed?

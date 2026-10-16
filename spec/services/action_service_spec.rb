@@ -59,6 +59,18 @@ describe ActionService do
       end
     end
 
+    context 'when agent is not a member of the inbox' do
+      it 'does not assign the agent and logs why' do
+        allow(Rails.logger).to receive(:warn)
+        original_assignee = conversation.assignee
+
+        action_service.assign_agent([agent.id])
+
+        expect(conversation.reload.assignee).to eq(original_assignee)
+        expect(Rails.logger).to have_received(:warn).with(/agent #{agent.id} is neither a member of inbox #{conversation.inbox_id}/)
+      end
+    end
+
     context 'when agent is unconfirmed' do
       let(:unconfirmed_agent) { create(:user, account: account, role: :agent, skip_confirmation: false) }
       let(:unconfirmed_inbox_member) { create(:inbox_member, inbox: conversation.inbox, user: unconfirmed_agent) }
