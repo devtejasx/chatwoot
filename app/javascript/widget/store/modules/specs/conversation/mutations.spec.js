@@ -112,9 +112,27 @@ describe('#mutations', () => {
     });
 
     it('sets isAgentTyping flag to false', () => {
-      const state = { uiFlags: { isAgentTyping: true } };
+      const state = { conversations: {}, uiFlags: { isAgentTyping: true } };
       mutations.toggleAgentTypingStatus(state, { status: 'off' });
       expect(state.uiFlags.isAgentTyping).toEqual(false);
+    });
+
+    it('remembers the last message when typing is turned off', () => {
+      const state = {
+        conversations: { 1: { id: 1 }, 2: { id: 2 } },
+        uiFlags: { isAgentTyping: false, typingStoppedAtMessageId: null },
+      };
+      mutations.toggleAgentTypingStatus(state, { status: 'off' });
+      expect(state.uiFlags.typingStoppedAtMessageId).toEqual(2);
+    });
+
+    it('keeps the remembered message when typing is turned on', () => {
+      const state = {
+        conversations: { 1: { id: 1 }, 2: { id: 2 } },
+        uiFlags: { isAgentTyping: false, typingStoppedAtMessageId: 1 },
+      };
+      mutations.toggleAgentTypingStatus(state, { status: 'on' });
+      expect(state.uiFlags.typingStoppedAtMessageId).toEqual(1);
     });
   });
 

@@ -39,6 +39,7 @@ export default {
       isFetchingList: 'conversation/getIsFetchingList',
       conversationSize: 'conversation/getConversationSize',
       isAgentTyping: 'conversation/getIsAgentTyping',
+      typingStoppedAtMessageId: 'conversation/getTypingStoppedAtMessageId',
       conversationAttributes: 'conversationAttributes/getConversationParams',
     }),
     colorSchemeClass() {
@@ -49,9 +50,14 @@ export default {
       const isConversationInPendingStatus = status === 'pending';
       const isLastMessageIncoming =
         this.lastMessage.message_type === MESSAGE_TYPE.INCOMING;
+      // A typing off event (e.g. from a bot that decided not to reply) hides the indicator for this message
+      const hasTypingStopped =
+        this.lastMessage.id === this.typingStoppedAtMessageId;
       return (
         this.isAgentTyping ||
-        (isConversationInPendingStatus && isLastMessageIncoming)
+        (isConversationInPendingStatus &&
+          isLastMessageIncoming &&
+          !hasTypingStopped)
       );
     },
   },

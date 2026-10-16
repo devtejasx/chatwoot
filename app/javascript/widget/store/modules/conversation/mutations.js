@@ -102,6 +102,12 @@ export const mutations = {
 
   toggleAgentTypingStatus($state, { status }) {
     $state.uiFlags.isAgentTyping = status === 'on';
+    if (status === 'off') {
+      // The pending reply indicator stays hidden until a newer message arrives
+      $state.uiFlags.typingStoppedAtMessageId = Object.values(
+        $state.conversations
+      ).at(-1)?.id;
+    }
   },
 
   setMetaUserLastSeenAt($state, lastSeen) {

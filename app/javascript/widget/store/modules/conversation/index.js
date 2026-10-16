@@ -12,6 +12,7 @@ const state = {
     isFetchingList: false,
     isAgentTyping: false,
     isCreating: false,
+    typingStoppedAtMessageId: null,
   },
   lastMessageId: null,
   pendingCustomAttributes: {},
