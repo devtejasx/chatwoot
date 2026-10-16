@@ -5,6 +5,7 @@ import { provideMessageContext } from './provider.js';
 import { useTrack } from 'dashboard/composables';
 import { useMapGetter } from 'dashboard/composables/store';
 import { emitter } from 'shared/helpers/mitt';
+import { useEmitter } from 'dashboard/composables/emitter';
 import { useI18n } from 'vue-i18n';
 import { useRoute } from 'vue-router';
 import { LocalStorage } from 'shared/helpers/localStorage';
@@ -538,11 +539,7 @@ const avatarTooltip = computed(() => {
   return `${t('CONVERSATION.SENT_BY')} ${avatarInfo.value.name}`;
 });
 
-const setupHighlightTimer = () => {
-  if (Number(route.query.messageId) !== Number(props.id)) {
-    return;
-  }
-
+const highlightMessage = () => {
   showBackgroundHighlight.value = true;
   const HIGHLIGHT_TIMER = 1000;
   useTimeoutFn(() => {
@@ -550,7 +547,20 @@ const setupHighlightTimer = () => {
   }, HIGHLIGHT_TIMER);
 };
 
+const setupHighlightTimer = () => {
+  if (Number(route.query.messageId) !== Number(props.id)) {
+    return;
+  }
+
+  highlightMessage();
+};
+
 onMounted(setupHighlightTimer);
+
+// Clicking a reply preview scrolls to the quoted message, so highlight it like a message link does
+useEmitter(BUS_EVENTS.SCROLL_TO_MESSAGE, ({ messageId } = {}) => {
+  if (Number(messageId) === Number(props.id)) highlightMessage();
+});
 
 provideMessageContext({
   ...toRefs(props),
