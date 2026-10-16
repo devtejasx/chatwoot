@@ -146,6 +146,18 @@ describe WebhookListener do
         listener.conversation_created(conversation_created_event)
       end
 
+      it 'sends the first message even when an automated reply came after it' do
+        webhook = create(:webhook, inbox: inbox, account: account)
+        create(:message, message_type: 'template', content: 'We are away', account: account, inbox: inbox, conversation: conversation)
+        expect(WebhookJob).to receive(:perform_later).with(
+          webhook.url,
+          hash_including(messages: [message.webhook_push_event_data]),
+          :account_webhook,
+          hash_including(secret: webhook.secret)
+        ).once
+        listener.conversation_created(conversation_created_event)
+      end
+
       it 'includes account details in the conversation payload' do
         webhook = create(:webhook, inbox: inbox, account: account)
         expect(WebhookJob).to receive(:perform_later).with(

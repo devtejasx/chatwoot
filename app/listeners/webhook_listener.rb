@@ -18,7 +18,9 @@ class WebhookListener < BaseListener
   def conversation_created(event)
     conversation = extract_conversation_and_account(event)[0]
     inbox = conversation.inbox
-    payload = conversation.webhook_data.merge(event: __method__.to_s)
+    # An automated reply (e.g. out of office) can already be the latest message, so send the one that started the conversation
+    first_message = conversation.messages.chat.first
+    payload = conversation.webhook_data.merge(event: __method__.to_s, messages: [first_message&.webhook_push_event_data].compact)
     deliver_webhook_payloads(payload, inbox)
   end
 
