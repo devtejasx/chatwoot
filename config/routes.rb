@@ -199,7 +199,12 @@ Rails.application.routes.draw do
               end
               resource :contact_info_request, only: [:show, :create]
               resources :assignments, only: [:create]
-              resources :labels, only: [:create, :index]
+              resources :labels, only: [:create, :index] do
+                collection do
+                  post :add
+                  post :remove
+                end
+              end
               resource :participants, only: [:show, :create, :update, :destroy]
               resource :direct_uploads, only: [:create]
               resource :draft_messages, only: [:show, :update, :destroy]

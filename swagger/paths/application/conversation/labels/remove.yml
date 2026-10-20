@@ -1,0 +1,43 @@
+tags:
+  - Conversations
+operationId: conversation-remove-labels
+summary: Remove Labels
+security:
+  - userBearerAuth: []
+  - agentBotBearerAuth: []
+  - userApiKey: []
+description: Remove the given labels from a conversation and keep its other labels.
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+          - labels
+        properties:
+          labels:
+            type: array
+            description: Labels to remove from the conversation
+            items:
+              type: string
+            example: ['support', 'billing']
+responses:
+  '200':
+    description: Success
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/conversation_labels'
+  '404':
+    description: Conversation not found
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'
+  '401':
+    description: Unauthorized
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/bad_request_error'

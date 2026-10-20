@@ -420,6 +420,18 @@
     $ref: ./application/conversation/labels/index.yml
   post:
     $ref: ./application/conversation/labels/create.yml
+/api/v1/accounts/{account_id}/conversations/{conversation_id}/labels/add:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+    - $ref: '#/components/parameters/conversation_id'
+  post:
+    $ref: ./application/conversation/labels/add.yml
+/api/v1/accounts/{account_id}/conversations/{conversation_id}/labels/remove:
+  parameters:
+    - $ref: '#/components/parameters/account_id'
+    - $ref: '#/components/parameters/conversation_id'
+  post:
+    $ref: ./application/conversation/labels/remove.yml
 
 # Conversation Reporting Events
 
