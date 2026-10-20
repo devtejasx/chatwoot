@@ -188,6 +188,13 @@ class Contact < ApplicationRecord
     find_by(email: email&.downcase)
   end
 
+  # After a failed save, the contact that already holds the taken identifier,
+  # email or phone number, checked in the order the client API resolves contacts.
+  def conflicting_contact
+    taken_attributes = %i[identifier email phone_number].select { |attribute| errors.of_kind?(attribute, :taken) }
+    taken_attributes.lazy.filter_map { |attribute| account.contacts.where.not(id: id).find_by(attribute => self[attribute]) }.first
+  end
+
   private
 
   def ip_lookup

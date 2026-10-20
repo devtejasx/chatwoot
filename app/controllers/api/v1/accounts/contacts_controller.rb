@@ -201,11 +201,7 @@ class Api::V1::Accounts::ContactsController < Api::V1::Accounts::BaseController
   end
 
   def set_include_contact_inboxes
-    @include_contact_inboxes = if params[:include_contact_inboxes].present?
-                                 params[:include_contact_inboxes] == 'true'
-                               else
-                                 true
-                               end
+    @include_contact_inboxes = params[:include_contact_inboxes].blank? || params[:include_contact_inboxes] == 'true'
   end
 
   def fetch_contact
@@ -220,6 +216,12 @@ class Api::V1::Accounts::ContactsController < Api::V1::Accounts::BaseController
 
   def render_error(error, error_status)
     render json: error, status: error_status
+  end
+
+  # Name the contact that already has the email, phone number or identifier,
+  # so API clients can use it instead of searching for it.
+  def record_invalid_payload(record)
+    super.merge(contact_id: record.try(:conflicting_contact)&.id).compact
   end
 end
 

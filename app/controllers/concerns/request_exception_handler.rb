@@ -57,10 +57,14 @@ module RequestExceptionHandler
 
   def render_record_invalid(exception)
     log_handled_error(exception)
-    render json: {
-      message: exception.record.errors.full_messages.join(', '),
-      attributes: exception.record.errors.attribute_names
-    }, status: :unprocessable_entity
+    render json: record_invalid_payload(exception.record), status: :unprocessable_entity
+  end
+
+  def record_invalid_payload(record)
+    {
+      message: record.errors.full_messages.join(', '),
+      attributes: record.errors.attribute_names
+    }
   end
 
   def render_error_response(exception)

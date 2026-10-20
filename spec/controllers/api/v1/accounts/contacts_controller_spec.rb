@@ -593,6 +593,37 @@ RSpec.describe 'Contacts API', type: :request do
         expect(json_response['message']).to eq('Name is too long (maximum is 255 characters)')
       end
 
+      it 'returns the id of the contact that already has the phone number' do
+        existing_contact = create(:contact, account: account, phone_number: '+14155550101')
+
+        post "/api/v1/accounts/#{account.id}/contacts", headers: admin.create_new_auth_token,
+                                                        params: valid_params.merge(phone_number: '+14155550101')
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body).to include(
+          'message' => 'Phone number has already been taken',
+          'attributes' => ['phone_number'],
+          'contact_id' => existing_contact.id
+        )
+      end
+
+      it 'returns the id of the contact that already has the email' do
+        existing_contact = create(:contact, account: account, email: 'taken@example.com')
+
+        post "/api/v1/accounts/#{account.id}/contacts", headers: admin.create_new_auth_token,
+                                                        params: valid_params.merge(email: 'Taken@Example.com')
+
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response.parsed_body['contact_id']).to eq(existing_contact.id)
+      end
+
+      it 'does not return a contact id for other validation errors' do
+        post "/api/v1/accounts/#{account.id}/contacts", headers: admin.create_new_auth_token,
+                                                        params: valid_params.merge(name: 'test' * 999)
+
+        expect(response.parsed_body).not_to have_key('contact_id')
+      end
+
       it 'creates the contact inbox when inbox id is passed' do
         expect do
           post "/api/v1/accounts/#{account.id}/contacts", headers: admin.create_new_auth_token,
