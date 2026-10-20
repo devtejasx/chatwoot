@@ -538,6 +538,18 @@ RSpec.describe 'Conversations API', type: :request do
           expect(response_data[:meta][:team][:name]).to eq(team.name)
         end
 
+        it 'creates a new conversation with labels' do
+          post "/api/v1/accounts/#{account.id}/conversations",
+               headers: agent.create_new_auth_token,
+               params: { source_id: contact_inbox.source_id, contact_id: contact.id, inbox_id: inbox.id, labels: %w[campaign-x billing] },
+               as: :json
+
+          expect(response).to have_http_status(:success)
+          response_data = JSON.parse(response.body, symbolize_names: true)
+          expect(response_data[:labels]).to contain_exactly('campaign-x', 'billing')
+          expect(account.conversations.find_by(display_id: response_data[:id]).label_list).to contain_exactly('campaign-x', 'billing')
+        end
+
         it 'does not create a conversation with an assignee from another account' do
           other_user = create(:user, account: create(:account))
 

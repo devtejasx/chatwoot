@@ -29,6 +29,29 @@ describe ConversationBuilder do
       expect(conversation.contact_inbox_id).to eq(contact_api_inbox.id)
     end
 
+    it 'creates the conversation with the given labels' do
+      conversation = described_class.new(
+        contact_inbox: contact_api_inbox,
+        params: { labels: %w[campaign-x billing] }
+      ).perform
+
+      expect(conversation.reload.label_list).to contain_exactly('campaign-x', 'billing')
+    end
+
+    it 'includes the labels in the conversation created event' do
+      allow(Rails.configuration.dispatcher).to receive(:dispatch)
+
+      described_class.new(
+        contact_inbox: contact_api_inbox,
+        params: { labels: ['campaign-x'] }
+      ).perform
+
+      expect(Rails.configuration.dispatcher).to have_received(:dispatch).with(
+        Conversation::CONVERSATION_CREATED, kind_of(Time),
+        hash_including(conversation: having_attributes(label_list: ['campaign-x']))
+      )
+    end
+
     context 'when lock_to_single_conversation is true for sms inbox' do
       before do
         sms_inbox.update!(lock_to_single_conversation: true)

@@ -41,6 +41,12 @@ properties:
     type: integer
     description: Team Id for assigning a conversation to a team\
     example: 1
+  labels:
+    type: array
+    description: Labels to add to the conversation when it is created
+    items:
+      type: string
+    example: ['support', 'billing']
   snoozed_until:
     type: string
     format: date-time

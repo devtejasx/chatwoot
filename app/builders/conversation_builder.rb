@@ -35,6 +35,10 @@ class ConversationBuilder
       snoozed_until: params[:snoozed_until],
       assignee_id: params[:assignee_id],
       team_id: params[:team_id]
-    }.merge(status)
+    }.merge(status).merge(label_params)
+  end
+
+  def label_params
+    params[:labels].present? ? { label_list: Array(params[:labels]) } : {}
   end
 end
