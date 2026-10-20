@@ -1,6 +1,10 @@
 import { required, minLength } from '@vuelidate/validators';
 
-export const validLabelCharacters = (str = '') => !!str && !str.includes(' ');
+// Mirrors Label's title format (RegexHelper::UNICODE_CHARACTER_NUMBER_HYPHEN_UNDERSCORE),
+// so the form rejects what the server would reject.
+const LABEL_TITLE_REGEX = /^[\p{L}\p{N}]+[\p{L}\p{N}_-]+$/u;
+
+export const validLabelCharacters = (str = '') => LABEL_TITLE_REGEX.test(str);
 
 export const getLabelTitleErrorMessage = validation => {
   let errorMessage = '';
