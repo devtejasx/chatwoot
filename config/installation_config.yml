@@ -626,6 +626,12 @@
   locked: false
   description: 'Show SAML SSO as a login option. Cannot be disabled if any users are using SAML authentication.'
   type: boolean
+- name: ENABLE_EMAIL_PASSWORD_LOGIN
+  display_title: 'Enable email and password login'
+  value: true
+  locked: false
+  description: 'Show the email and password form and the password reset link on the login page. Turn this off when every user signs in through SSO. The super admin console keeps password login.'
+  type: boolean
 ## ------ End of Configs added for SAML SSO ------ ##
 
 ## ------ Configs added for Cloudflare ------ ##

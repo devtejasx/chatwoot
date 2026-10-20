@@ -78,6 +78,6 @@ module Enterprise::SuperAdmin::AppConfigsController
   end
 
   def saml_config_options
-    %w[ENABLE_SAML_SSO_LOGIN]
+    %w[ENABLE_SAML_SSO_LOGIN ENABLE_EMAIL_PASSWORD_LOGIN]
   end
 end

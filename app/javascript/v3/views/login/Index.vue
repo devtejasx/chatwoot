@@ -105,6 +105,9 @@ export default {
     allowedLoginMethods() {
       return window.chatwootConfig.allowedLoginMethods || ['email'];
     },
+    showEmailLogin() {
+      return this.allowedLoginMethods.includes('email');
+    },
     showGoogleOAuth() {
       return (
         this.allowedLoginMethods.includes('google_oauth') &&
@@ -486,12 +489,16 @@ export default {
             </router-link>
           </div>
           <SimpleDivider
-            v-if="showGoogleOAuth || showSamlLogin"
+            v-if="showEmailLogin && (showGoogleOAuth || showSamlLogin)"
             :label="$t('COMMON.OR')"
             class="uppercase"
           />
         </div>
-        <form class="space-y-5" @submit.prevent="submitFormLogin">
+        <form
+          v-if="showEmailLogin"
+          class="space-y-5"
+          @submit.prevent="submitFormLogin"
+        >
           <FormInput
             v-model="credentials.email"
             name="email_address"

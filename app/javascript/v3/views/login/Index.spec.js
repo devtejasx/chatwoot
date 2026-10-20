@@ -48,6 +48,22 @@ describe('login retries', () => {
   });
 });
 
+describe('email and password login', () => {
+  it('is shown when email is an allowed login method', () => {
+    expect(
+      Login.computed.showEmailLogin.call({
+        allowedLoginMethods: ['email', 'saml'],
+      })
+    ).toBe(true);
+  });
+
+  it('is hidden when the installation turns email login off', () => {
+    expect(
+      Login.computed.showEmailLogin.call({ allowedLoginMethods: ['saml'] })
+    ).toBe(false);
+  });
+});
+
 describe('SAML login', () => {
   it('carries the pending Shopify install redirect to the SSO route', () => {
     const redirectUrl = `settings/integrations/shopify?shopify_pending_install=${'a'.repeat(32)}`;

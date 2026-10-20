@@ -18,6 +18,19 @@ describe '/app/login', type: :request do
     end
   end
 
+  context 'with ENABLE_EMAIL_PASSWORD_LOGIN' do
+    it 'lists email as a login method by default' do
+      get '/app/login'
+      expect(response.body).to include('allowedLoginMethods: ["email"')
+    end
+
+    it 'leaves email out of the login methods when it is turned off' do
+      create(:installation_config, name: 'ENABLE_EMAIL_PASSWORD_LOGIN', value: false)
+      get '/app/login'
+      expect(response.body).not_to include('allowedLoginMethods: ["email"')
+    end
+  end
+
   context 'with non-HTML format' do
     it 'returns not acceptable for JSON with error message' do
       get '/app/login', headers: { 'Accept' => 'application/json' }
