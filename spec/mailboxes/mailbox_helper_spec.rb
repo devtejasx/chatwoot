@@ -101,6 +101,17 @@ RSpec.describe MailboxHelper do
       text_content = helper_instance.instance_variable_get(:@text_content)
       expect(text_content).to include(Rails.application.routes.url_helpers.url_for(mail_attachment[:blob]))
     end
+
+    it 'keeps backslashes in the attachment name as they are' do
+      name = 'scan\0 \1 copy.png'
+      mail_attachment[:original] = OpenStruct.new(filename: name)
+      allow(helper_instance).to receive(:inline_image_url).and_return('https://example.com/blob')
+      helper_instance.instance_variable_set(:@text_content, "Hello [image: #{name}] World")
+      helper_instance.send(:embed_plain_text_email_with_inline_image, mail_attachment)
+
+      text_content = helper_instance.instance_variable_get(:@text_content)
+      expect(text_content).to eq("Hello <img src=\"https://example.com/blob\" alt=\"#{name}\"> World")
+    end
   end
 
   describe '#body_references_cid?' do

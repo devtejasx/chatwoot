@@ -79,7 +79,9 @@ module MailboxHelper
     tag_to_replace = "[image: #{attachment_name}]"
 
     if @text_content.include?(tag_to_replace)
-      @text_content = @text_content.gsub(tag_to_replace, img_tag)
+      # Block form: a replacement string would read backslash sequences in the
+      # sender's attachment name (\0, \1, \\) as references to the match.
+      @text_content = @text_content.gsub(tag_to_replace) { img_tag }
     else
       @text_content += "\n\n#{img_tag}"
     end
