@@ -15,7 +15,10 @@ import {
   removeClasses,
   restoreWidgetInDOM,
 } from '../sdk/DOMHelpers';
-import { setCookieWithDomain } from '../sdk/cookieHelpers';
+import {
+  removeCookieWithDomain,
+  setCookieWithDomain,
+} from '../sdk/cookieHelpers';
 import { SDK_SET_BUBBLE_VISIBILITY } from 'shared/constants/sharedFrameEvents';
 
 const runSDK = ({ baseUrl, websiteToken }) => {
@@ -197,8 +200,9 @@ const runSDK = ({ baseUrl, websiteToken }) => {
         IFrameHelper.events.toggleBubble();
       }
 
-      Cookies.remove('cw_conversation');
-      Cookies.remove(getUserCookieName());
+      const cookieOptions = { baseDomain: window.$chatwoot.baseDomain };
+      removeCookieWithDomain('cw_conversation', cookieOptions);
+      removeCookieWithDomain(getUserCookieName(), cookieOptions);
 
       const iframe = IFrameHelper.getAppFrame();
       iframe.src = IFrameHelper.getUrl({

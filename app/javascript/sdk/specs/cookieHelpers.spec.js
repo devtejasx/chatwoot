@@ -5,6 +5,7 @@ import {
   getUserCookieName,
   getUserString,
   hasUserKeys,
+  removeCookieWithDomain,
   setCookieWithDomain,
 } from '../cookieHelpers';
 
@@ -385,6 +386,30 @@ describe('setCookieWithDomain', () => {
     expect(Cookies.set).toHaveBeenCalledWith('myCookie', 'cookieValue', {
       expires: 7,
       sameSite: 'Lax',
+      domain: 'example.com',
+    });
+  });
+});
+
+describe('removeCookieWithDomain', () => {
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it('removes the cookie without a domain by default', () => {
+    vi.spyOn(Cookies, 'remove');
+    removeCookieWithDomain('myCookie');
+
+    expect(Cookies.remove).toHaveBeenCalledWith('myCookie', {
+      domain: undefined,
+    });
+  });
+
+  it('removes a cookie that was set on the base domain', () => {
+    vi.spyOn(Cookies, 'remove');
+    removeCookieWithDomain('myCookie', { baseDomain: 'example.com' });
+
+    expect(Cookies.remove).toHaveBeenCalledWith('myCookie', {
       domain: 'example.com',
     });
   });

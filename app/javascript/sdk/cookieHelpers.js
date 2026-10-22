@@ -76,3 +76,11 @@ export const setCookieWithDomain = (
 
   Cookies.set(name, value, cookieOptions);
 };
+
+// js-cookie only removes a cookie when it is given the domain it was set with
+export const removeCookieWithDomain = (
+  name,
+  { baseDomain = undefined } = {}
+) => {
+  Cookies.remove(name, { domain: baseDomain });
+};
