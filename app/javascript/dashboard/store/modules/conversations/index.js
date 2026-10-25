@@ -253,7 +253,15 @@ export const mutations = {
 
     const pendingMessageIndex = findPendingMessageIndex(chat, message);
     if (pendingMessageIndex !== -1) {
-      chat.messages[pendingMessageIndex] = message;
+      const { status: currentStatus } = chat.messages[pendingMessageIndex];
+      // A delivery receipt can arrive before the send request resolves; the
+      // later "sent" from that response must not downgrade it.
+      const isStaleSent =
+        message.status === MESSAGE_STATUS.SENT &&
+        [MESSAGE_STATUS.DELIVERED, MESSAGE_STATUS.READ].includes(currentStatus);
+      chat.messages[pendingMessageIndex] = isStaleSent
+        ? { ...message, status: currentStatus }
+        : message;
     } else {
       chat.messages.push(message);
       chat.timestamp = message.created_at;

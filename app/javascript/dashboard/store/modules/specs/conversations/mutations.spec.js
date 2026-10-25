@@ -208,6 +208,49 @@ describe('#mutations', () => {
       ]);
       expect(emitter.emit).not.toHaveBeenCalled();
     });
+
+    it('does not downgrade a delivered or read message to sent', () => {
+      ['delivered', 'read'].forEach(currentStatus => {
+        const state = {
+          allConversations: [
+            {
+              id: 1,
+              messages: [{ id: 10, conversation_id: 1, status: currentStatus }],
+            },
+          ],
+          selectedChatId: 1,
+        };
+        mutations[types.ADD_MESSAGE](state, {
+          id: 10,
+          conversation_id: 1,
+          content: 'Hello',
+          status: 'sent',
+        });
+        expect(state.allConversations[0].messages).toEqual([
+          {
+            id: 10,
+            conversation_id: 1,
+            content: 'Hello',
+            status: currentStatus,
+          },
+        ]);
+      });
+    });
+
+    it('updates a sent message to delivered', () => {
+      const state = {
+        allConversations: [
+          { id: 1, messages: [{ id: 10, conversation_id: 1, status: 'sent' }] },
+        ],
+        selectedChatId: 1,
+      };
+      mutations[types.ADD_MESSAGE](state, {
+        id: 10,
+        conversation_id: 1,
+        status: 'delivered',
+      });
+      expect(state.allConversations[0].messages[0].status).toBe('delivered');
+    });
   });
 
   describe('#CHANGE_CONVERSATION_STATUS', () => {
